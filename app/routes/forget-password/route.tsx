@@ -6,37 +6,38 @@ import { Button } from "~/components/button";
 import { Input, Label } from "~/components/input";
 
 import { validate } from "./validate";
-import { login } from "./queries";
+import { resetPassword } from "./queries";
 
 export const loader = redirectIfLoggedInLoader;
 
 export const meta = () => {
-  return [{ title: "Trellix Login" }];
+  return [{ title: "Trellix Forget Password" }];
 };
 
 export async function action({ request }: DataFunctionArgs) {
   let formData = await request.formData();
   let email = String(formData.get("email") || "");
   let password = String(formData.get("password") || "");
+  let confirmPassword = String(formData.get("confirm-password") || "");
 
-  let errors = validate(email, password);
+  let errors = validate(email, password, confirmPassword);
   if (errors) {
     return json({ ok: false, errors }, 400);
   }
 
-  let userId = await login(email, password);
-  if (userId === false) {
+  let user = await resetPassword(email, password);
+  if (user === false) {
     return json(
-      { ok: false, errors: { password: "Invalid credentials" } },
+      { ok: false, errors: { password: "Cannot reset password" } },
       400,
     );
   }
 
   let response = redirect("/home");
-  return setAuthOnResponse(response, userId);
+  return setAuthOnResponse(response, user.id);
 }
 
-export default function Signup() {
+export default function ForgetPassword() {
   let actionResult = useActionData<typeof action>();
 
   return (
@@ -46,7 +47,7 @@ export default function Signup() {
           id="login-header"
           className="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900"
         >
-          Log in
+          Change Password
         </h2>
       </div>
 
@@ -76,19 +77,7 @@ export default function Signup() {
             </div>
 
             <div>
-              <div className="flex items-start justify-between">
-                <Label htmlFor="password">
-                  Password{" "}
-                  {actionResult?.errors?.password && (
-                    <span id="password-error" className="text-brand-red">
-                    {actionResult.errors.password}
-                  </span>
-                  )}
-                </Label>
-                <Link className="underline text-sm text-slate-500" to="/forget-password">
-                  Forgot password?
-                </Link>
-              </div>
+              <Label htmlFor="password">New password </Label>
               <Input
                 id="password"
                 name="password"
@@ -100,14 +89,26 @@ export default function Signup() {
             </div>
 
             <div>
-              <Button type="submit">Sign in</Button>
+              <Label htmlFor="confirm-password">
+                Confirm password{" "}
+                {actionResult?.errors?.password && (
+                  <span id="password-error" className="text-brand-red">
+                    {actionResult.errors.password}
+                  </span>
+                )}
+              </Label>
+              <Input
+                id="confirm-password"
+                name="confirm-password"
+                type="password"
+                autoComplete="current-password"
+                aria-describedby="password-error"
+                required
+              />
             </div>
-            <div className="text-sm text-slate-500">
-              Don't have an account?{" "}
-              <Link className="underline" to="/signup">
-                Sign up
-              </Link>
-              .
+
+            <div>
+              <Button type="submit">Reset password</Button>
             </div>
           </Form>
         </div>
