@@ -9,14 +9,19 @@ import {
   type ShouldRevalidateFunctionArgs,
   Link,
 } from "@remix-run/react";
-import { redirect, type DataFunctionArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
+import type { LinksFunction, ActionFunctionArgs } from "@remix-run/node";
 
 import { LoginIcon, LogoutIcon } from "./icons/icons";
 import { getAuthFromRequest } from "./auth/auth";
 
-import "./styles.css";
+import stylesheet from "./styles.css";
 
-export async function loader({ request }: DataFunctionArgs) {
+export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: stylesheet },
+];
+
+export async function loader({ request }: ActionFunctionArgs) {
   let auth = await getAuthFromRequest(request);
   if (auth && new URL(request.url).pathname === "/") {
     throw redirect("/home");

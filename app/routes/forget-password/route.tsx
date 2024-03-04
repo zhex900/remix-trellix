@@ -1,5 +1,6 @@
-import { json, redirect, type DataFunctionArgs } from "@remix-run/node";
-import { Form, Link, useActionData } from "@remix-run/react";
+import { json, redirect } from "@remix-run/node";
+import type { ActionFunctionArgs } from "@remix-run/node";
+import { Form, useActionData } from "@remix-run/react";
 
 import { redirectIfLoggedInLoader, setAuthOnResponse } from "~/auth/auth";
 import { Button } from "~/components/button";
@@ -14,7 +15,7 @@ export const meta = () => {
   return [{ title: "Trellix Forget Password" }];
 };
 
-export async function action({ request }: DataFunctionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
   let formData = await request.formData();
   let email = String(formData.get("email") || "");
   let password = String(formData.get("password") || "");
