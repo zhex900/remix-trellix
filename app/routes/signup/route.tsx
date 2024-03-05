@@ -87,7 +87,7 @@ export default function Signup() {
               />
             </div>
 
-            <Button type="submit">Sign in</Button>
+            <Button type="submit">Sign up</Button>
 
             <div className="text-sm text-slate-500">
               Already have an account?{" "}
